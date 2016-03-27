@@ -2,18 +2,22 @@ package csp;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 
 import java.awt.*;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Pentominoes {
 
     final ImmutableSet<Point> squares;
+    public final int width, height;
 
     // so we only have to instantiate Points once for the mess of
     // Pentomino enums
     private static Table<Integer, Integer, Point> points;
+
     static {
         points = HashBasedTable.create();
         for (int row = 0; row < 5; ++row) {
@@ -114,27 +118,81 @@ public class Pentominoes {
 
         Set<Set<Point>> orientations;
 
-        private PentominoShape(Set<Set<Point>> orientations) {
+        PentominoShape(Set<Set<Point>> orientations) {
             this.orientations = orientations;
         }
     }
 
     public Pentominoes(Set<Point> squares) {
         this.squares = ImmutableSet.copyOf(squares);
+        this.width = getWidth();
+        this.height = getHeight();
     }
 
     public Set<Pentomino> solve() {
-        ExactCoverProblem ecp = new ExactCoverProblem();
-
-
-
-        return null;
+        return new ExactCoverProblem<Pentomino, PentominoConstraint>(makeCandidates(), makeConstraints()) {
+            @Override
+            public boolean relation(PentominoConstraint constraint, Pentomino candidate) {
+                return constraint.isSatisfiedBy(candidate);
+            }
+        }.solve();
     }
 
-    static class PentominoFactory {
-
+    private Set<PentominoConstraint> makeConstraints() {
+        return Sets.union(
+                EnumSet.allOf(PentominoShape.class)
+                        .stream()
+                        .map(shape -> new ShapeIsPresentConstraint(shape))
+                        .collect(Collectors.toSet()),
+                squares
+                        .stream()
+                        .map(square -> new ShapeOccupiesSquareConstraint(square))
+                        .collect(Collectors.toSet())
+        );
     }
 
+    public Set<Pentomino> makeCandidates() {
+        return EnumSet
+                .allOf(PentominoShape.class)
+                .stream()
+                .flatMap(shape -> makeCandidatesForShape(shape).stream())
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Pentomino> makeCandidatesForShape(PentominoShape shape) {
+        return shape.orientations.stream()
+                .flatMap(orientation -> {
+                    Set<Set<Point>> translations = translateAcrossSquares(orientation);
+                    return translations.stream().map(points -> new Pentomino(shape, points));
+                }).collect(Collectors.toSet());
+    }
+
+    public Set<Set<Point>> translateAcrossSquares(Set<Point> points) {
+        Set<Set<Point>> t = new HashSet();
+        Set<Point> p;
+
+        for (int i = 0; i < width; ++i) {
+            for (int j = 0; j < height; ++j) {
+                p = translate(points, i, j);
+                if (squares.containsAll(p)) {
+                    t.add(p);
+                }
+            }
+        }
+        return t;
+    }
+
+    public static Set<Point> translate(Set<Point> points, final int dx, final int dy) {
+        return points.stream().map(point -> new Point(point.x + dx, point.y + dy)).collect(Collectors.toSet());
+    }
+
+    int getWidth() {
+        return this.squares.stream().max(Comparator.comparingInt((p) -> p.x)).get().x;
+    }
+
+    int getHeight() {
+        return this.squares.stream().max(Comparator.comparingInt((p) -> p.y)).get().y;
+    }
 
     class Pentomino {
         PentominoShape shape;
@@ -144,31 +202,63 @@ public class Pentominoes {
             this.shape = shape;
             this.cells = cells;
         }
-    }
 
-    class Candidate {
-        final Set<Point> cells;
-        final PentominoShape type;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pentomino pentomino = (Pentomino) o;
+            return shape == pentomino.shape &&
+                    Objects.equals(cells, pentomino.cells);
+        }
 
-        Candidate(PentominoShape type, Set<Point> cells) {
-            this.type = type;
-            this.cells = cells;
+        @Override
+        public int hashCode() {
+            return Objects.hash(shape, cells);
         }
     }
 
-    class ShapeIsPresentConstraint {
-        final PentominoShape pentomino;
+    abstract class PentominoConstraint {
+        public abstract boolean isSatisfiedBy(Pentomino pentomino);
+    }
 
-        ShapeIsPresentConstraint(PentominoShape pentomino) {
-            this.pentomino = pentomino;
+    class ShapeIsPresentConstraint extends PentominoConstraint {
+        final PentominoShape shape;
+
+        ShapeIsPresentConstraint(PentominoShape shape) {
+            this.shape = shape;
+        }
+
+        public boolean isSatisfiedBy(Pentomino pentomino) {
+            return pentomino.shape == shape;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("ShapeIsPresentConstraint{");
+            sb.append("shape=").append(shape);
+            sb.append('}');
+            return sb.toString();
         }
     }
 
-    class ShapeOccupiesSquareConstraint {
+    class ShapeOccupiesSquareConstraint extends PentominoConstraint {
         final Point square;
 
         ShapeOccupiesSquareConstraint(Point square) {
             this.square = square;
+        }
+
+        public boolean isSatisfiedBy(Pentomino pentomino) {
+            return pentomino.cells.contains(square);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("ShapeOccupiesSquareConstraint{");
+            sb.append("square=").append(String.format("[%d,%d]", square.x, square.y));
+            sb.append('}');
+            return sb.toString();
         }
     }
 }
