@@ -93,12 +93,12 @@ public class PentominoesTest {
 
     @Test
     public void testGetWidth() {
-        assertEquals(11, test2.getWidth());
+        assertEquals(11, test2.getRightmost());
     }
 
     @Test
     public void testGetHeight() {
-        assertEquals(7, test1.getHeight());
+        assertEquals(7, test1.getTopmost());
     }
 
     @Test

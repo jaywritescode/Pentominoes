@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class Pentominoes {
 
     final ImmutableSet<Point> squares;
-    public final int width, height;
+    public final int rightmost, topmost;
 
     // so we only have to instantiate Points once for the mess of
     // Pentomino enums
@@ -125,8 +125,8 @@ public class Pentominoes {
 
     public Pentominoes(Set<Point> squares) {
         this.squares = ImmutableSet.copyOf(squares);
-        this.width = getWidth();
-        this.height = getHeight();
+        this.rightmost = getRightmost();
+        this.topmost = getTopmost();
     }
 
     public Set<Pentomino> solve() {
@@ -171,8 +171,8 @@ public class Pentominoes {
         Set<Set<Point>> t = new HashSet();
         Set<Point> p;
 
-        for (int i = 0; i < width; ++i) {
-            for (int j = 0; j < height; ++j) {
+        for (int i = 0; i <= rightmost; ++i) {
+            for (int j = 0; j <= topmost; ++j) {
                 p = translate(points, i, j);
                 if (squares.containsAll(p)) {
                     t.add(p);
@@ -186,11 +186,11 @@ public class Pentominoes {
         return points.stream().map(point -> new Point(point.x + dx, point.y + dy)).collect(Collectors.toSet());
     }
 
-    int getWidth() {
+    int getRightmost() {
         return this.squares.stream().max(Comparator.comparingInt((p) -> p.x)).get().x;
     }
 
-    int getHeight() {
+    int getTopmost() {
         return this.squares.stream().max(Comparator.comparingInt((p) -> p.y)).get().y;
     }
 
