@@ -13,6 +13,7 @@ public class Pentominoes {
 
     final ImmutableSet<Point> squares;
     public final int rightmost, topmost;
+    Set<Pentomino> solution = null;
 
     // so we only have to instantiate Points once for the mess of
     // Pentomino enums
@@ -130,6 +131,10 @@ public class Pentominoes {
     }
 
     public Set<Pentomino> solve() {
+        if (solution != null) {
+            return solution;
+        }
+
         return new ExactCoverProblem<Pentomino, PentominoConstraint>(makeCandidates(), makeConstraints()) {
             @Override
             public boolean relation(PentominoConstraint constraint, Pentomino candidate) {
