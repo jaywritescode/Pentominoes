@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -136,15 +137,15 @@ public class Pentominoes {
         int row = 0, column = 0;
         for (char k : puzzle.toCharArray()) {
             if (k == '\n') {
-                ++column;
-                row = 0;
+                ++row;
+                column = 0;
             }
             else if (k == ' ') {
-                ++row;
+                ++column;
             }
             else {
                 squares.add(new Point(row, column));
-                ++row;
+                ++column;
             }
         }
 
@@ -156,12 +157,38 @@ public class Pentominoes {
             return solution;
         }
 
-        return new ExactCoverProblem<Pentomino, PentominoConstraint>(makeCandidates(), makeConstraints()) {
+        return solution = new ExactCoverProblem<Pentomino, PentominoConstraint>(makeCandidates(), makeConstraints()) {
             @Override
             public boolean relation(PentominoConstraint constraint, Pentomino candidate) {
                 return constraint.isSatisfiedBy(candidate);
             }
         }.solve();
+    }
+
+    public void print() {
+        if (solution == null) {
+            solve();
+        }
+        
+        String[][] k = new String[topmost + 1][rightmost + 1];
+        solution.forEach(pentomino -> {
+            pentomino.cells.forEach(point -> k[point.y][point.x] = pentomino.shape.toString());
+        });
+
+        StringBuilder sb = new StringBuilder();
+        for (int row = 0; row <= topmost; ++row) {
+            for (int column = 0; column <= rightmost; ++column) {
+                if (k[row][column] == null) {
+                    sb.append(" ");
+                }
+                else {
+                    sb.append(k[row][column]);
+                }
+            }
+            sb.append("\n");
+        }
+
+        System.out.println(sb.toString());
     }
 
     private Set<PentominoConstraint> makeConstraints() {
@@ -270,5 +297,23 @@ public class Pentominoes {
         public boolean isSatisfiedBy(Pentomino pentomino) {
             return pentomino.cells.contains(square);
         }
+    }
+
+    public static void main(String... args) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            String line;
+            BufferedReader br = new BufferedReader(new FileReader("puzzles/puz1.txt"));
+
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Pentominoes pentominoes = Pentominoes.read(sb.toString());
+        pentominoes.solve();
+        pentominoes.print();
     }
 }
