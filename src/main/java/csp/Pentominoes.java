@@ -130,6 +130,27 @@ public class Pentominoes {
         this.topmost = getTopmost();
     }
 
+    public static Pentominoes read(String puzzle) {
+        Set<Point> squares = new HashSet();
+
+        int row = 0, column = 0;
+        for (char k : puzzle.toCharArray()) {
+            if (k == '\n') {
+                ++column;
+                row = 0;
+            }
+            else if (k == ' ') {
+                ++row;
+            }
+            else {
+                squares.add(new Point(row, column));
+                ++row;
+            }
+        }
+
+        return new Pentominoes(squares);
+    }
+
     public Set<Pentomino> solve() {
         if (solution != null) {
             return solution;
