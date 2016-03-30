@@ -232,14 +232,6 @@ public class Pentominoes {
         public boolean isSatisfiedBy(Pentomino pentomino) {
             return pentomino.shape == shape;
         }
-
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder("ShapeIsPresentConstraint{");
-            sb.append("shape=").append(shape);
-            sb.append('}');
-            return sb.toString();
-        }
     }
 
     class ShapeOccupiesSquareConstraint extends PentominoConstraint {
@@ -251,14 +243,6 @@ public class Pentominoes {
 
         public boolean isSatisfiedBy(Pentomino pentomino) {
             return pentomino.cells.contains(square);
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder("ShapeOccupiesSquareConstraint{");
-            sb.append("square=").append(String.format("[%d,%d]", square.x, square.y));
-            sb.append('}');
-            return sb.toString();
         }
     }
 }

@@ -4,8 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import csp.Pentominoes.*;
 
 import static org.junit.Assert.*;
 
@@ -102,7 +103,22 @@ public class PentominoesTest {
     }
 
     @Test
-    public void testConstraints() {
-        test1.solve();
+    public void testSolve() {
+        Set<Pentomino> solution = test1.solve();
+
+        for (PentominoShape shape : EnumSet.allOf(PentominoShape.class)) {
+            assertEquals(1, countShapesInSet(solution, shape));
+        }
+        for (Point point : test1.squares) {
+            assertEquals(1, countSquaresUsedInSet(solution, point));
+        }
+    }
+
+    private long countShapesInSet(Set<Pentomino> set, final PentominoShape shape) {
+        return set.stream().filter(p -> p.shape == shape).count();
+    }
+
+    private long countSquaresUsedInSet(Set<Pentomino> set, final Point point) {
+        return set.stream().filter(p -> p.cells.contains(point)).count();
     }
 }
