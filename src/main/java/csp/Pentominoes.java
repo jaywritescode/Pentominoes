@@ -156,7 +156,7 @@ public class Pentominoes {
         );
     }
 
-    public Set<Pentomino> makeCandidates() {
+    private Set<Pentomino> makeCandidates() {
         return EnumSet
                 .allOf(PentominoShape.class)
                 .stream()
@@ -164,7 +164,7 @@ public class Pentominoes {
                 .collect(Collectors.toSet());
     }
 
-    public Set<Pentomino> makeCandidatesForShape(PentominoShape shape) {
+    private Set<Pentomino> makeCandidatesForShape(PentominoShape shape) {
         return shape.orientations.stream()
                 .flatMap(orientation -> {
                     Set<Set<Point>> translations = translateAcrossSquares(orientation);
@@ -172,7 +172,7 @@ public class Pentominoes {
                 }).collect(Collectors.toSet());
     }
 
-    public Set<Set<Point>> translateAcrossSquares(Set<Point> points) {
+    private Set<Set<Point>> translateAcrossSquares(Set<Point> points) {
         Set<Set<Point>> t = new HashSet();
         Set<Point> p;
 
@@ -187,7 +187,7 @@ public class Pentominoes {
         return t;
     }
 
-    public static Set<Point> translate(Set<Point> points, final int dx, final int dy) {
+    private static Set<Point> translate(Set<Point> points, final int dx, final int dy) {
         return points.stream().map(point -> new Point(point.x + dx, point.y + dy)).collect(Collectors.toSet());
     }
 
