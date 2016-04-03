@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.*;
 
 import csp.Pentominoes.*;
@@ -12,105 +14,62 @@ import static org.junit.Assert.*;
 
 public class PentominoesTest {
 
-    Pentominoes test1, test2;
+    Pentominoes test0, test1, test2;
+    String puzzle0, puzzle1, puzzle2;
 
-    Set<Point> squares1 = new HashSet() {{
-        for (int i = 0; i < 8; ++i) {
-            for (int j = 0; j < 8; ++j) {
-                if ((i == 3 || i == 4) && (j == 3 || j == 4)) {
-                    continue;
-                }
-                this.add(new Point(i, j));
-            }
+    public PentominoesTest() throws Exception {
+        BufferedReader br;
+        String line;
+        StringBuilder sb;
+
+        sb = new StringBuilder();
+        br = new BufferedReader(new FileReader("puzzles/puz0.txt"));
+        while((line = br.readLine()) != null) {
+            sb.append(line).append("\n");
         }
-    }};
-    Set<Point> squares2 = new HashSet() {{
-        this.add(new Point(0, 4));
-        this.add(new Point(0, 5));
-        this.add(new Point(0, 6));
-        this.add(new Point(0, 7));
-        this.add(new Point(1, 2));
-        this.add(new Point(1, 3));
-        this.add(new Point(1, 4));
-        this.add(new Point(1, 5));
-        this.add(new Point(1, 6));
-        this.add(new Point(1, 7));
-        this.add(new Point(1, 8));
-        this.add(new Point(1, 9));
-        this.add(new Point(2, 1));
-        this.add(new Point(2, 2));
-        this.add(new Point(2, 3));
-        this.add(new Point(2, 4));
-        this.add(new Point(2, 5));
-        this.add(new Point(2, 6));
-        this.add(new Point(2, 7));
-        this.add(new Point(2, 8));
-        this.add(new Point(2, 9));
-        this.add(new Point(2, 10));
-        this.add(new Point(3, 1));
-        this.add(new Point(3, 2));
-        this.add(new Point(3, 3));
-        this.add(new Point(3, 4));
-        this.add(new Point(3, 5));
-        this.add(new Point(3, 6));
-        this.add(new Point(3, 7));
-        this.add(new Point(3, 8));
-        this.add(new Point(3, 9));
-        this.add(new Point(3, 10));
-        this.add(new Point(4, 0));
-        this.add(new Point(4, 1));
-        this.add(new Point(4, 2));
-        this.add(new Point(4, 3));
-        this.add(new Point(4, 4));
-        this.add(new Point(4, 5));
-        this.add(new Point(4, 6));
-        this.add(new Point(4, 7));
-        this.add(new Point(4, 8));
-        this.add(new Point(4, 9));
-        this.add(new Point(4, 10));
-        this.add(new Point(4, 11));
-        this.add(new Point(5, 0));
-        this.add(new Point(5, 1));
-        this.add(new Point(5, 2));
-        this.add(new Point(5, 3));
-        this.add(new Point(5, 8));
-        this.add(new Point(5, 9));
-        this.add(new Point(5, 10));
-        this.add(new Point(5, 11));
-        this.add(new Point(6, 0));
-        this.add(new Point(6, 1));
-        this.add(new Point(6, 2));
-        this.add(new Point(6, 3));
-        this.add(new Point(6, 8));
-        this.add(new Point(6, 9));
-        this.add(new Point(6, 10));
-        this.add(new Point(6, 11));
-    }};
+        puzzle0 = sb.toString();
+
+        sb = new StringBuilder();
+        br = new BufferedReader(new FileReader("puzzles/puz1.txt"));
+        while((line = br.readLine()) != null) {
+            sb.append(line).append("\n");
+        }
+        puzzle1 = sb.toString();
+
+        sb = new StringBuilder();
+        br = new BufferedReader(new FileReader("puzzles/puz2.txt"));
+        while((line = br.readLine()) != null) {
+            sb.append(line).append("\n");
+        }
+        puzzle2 = sb.toString();
+    }
 
     @Before
     public void setUp() {
-        test1 = new Pentominoes(squares1);
-        test2 = new Pentominoes(squares2);
+        test0 = Pentominoes.read(puzzle0);
+        test1 = Pentominoes.read(puzzle1);
+        test2 = Pentominoes.read(puzzle2);
     }
 
     @Test
-    public void testGetWidth() {
-        assertEquals(11, test2.getRightmost());
+    public void testGetRowCount() {
+        assertEquals(7, test2.getRowCount());
     }
 
     @Test
-    public void testGetHeight() {
-        assertEquals(7, test1.getTopmost());
+    public void testGetColumnCount() {
+        assertEquals(10, test2.getColumnCount());
     }
 
     @Test
     public void testSolve() {
-        Set<Pentomino> solution = test2.solve();
+        Set<Pentomino> solution = test1.solve();
+        assertNotNull(solution);
 
         for (PentominoShape shape : EnumSet.allOf(PentominoShape.class)) {
             assertEquals(1, countShapesInSet(solution, shape));
         }
-        for (Point point : test2.squares) {
+        for (Point point : test1.squares) {
             assertEquals(1, countSquaresUsedInSet(solution, point));
         }
     }

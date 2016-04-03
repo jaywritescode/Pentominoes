@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class Pentominoes {
 
     final ImmutableSet<Point> squares;
-    public final int rightmost, topmost;
+    public final int rowCount, columnCount;
     Set<Pentomino> solution = null;
 
     // so we only have to instantiate Points once for the mess of
@@ -127,8 +127,8 @@ public class Pentominoes {
 
     public Pentominoes(Set<Point> squares) {
         this.squares = ImmutableSet.copyOf(squares);
-        this.rightmost = getRightmost();
-        this.topmost = getTopmost();
+        this.rowCount = getRowCount();
+        this.columnCount = getColumnCount();
     }
 
     public static Pentominoes read(String puzzle) {
@@ -170,14 +170,14 @@ public class Pentominoes {
             solve();
         }
         
-        String[][] k = new String[topmost + 1][rightmost + 1];
+        String[][] k = new String[columnCount + 1][rowCount + 1];
         solution.forEach(pentomino -> {
             pentomino.cells.forEach(point -> k[point.y][point.x] = pentomino.shape.toString());
         });
 
         StringBuilder sb = new StringBuilder();
-        for (int row = 0; row <= topmost; ++row) {
-            for (int column = 0; column <= rightmost; ++column) {
+        for (int row = 0; row <= columnCount; ++row) {
+            for (int column = 0; column <= rowCount; ++column) {
                 if (k[row][column] == null) {
                     sb.append(" ");
                 }
@@ -224,8 +224,8 @@ public class Pentominoes {
         Set<Set<Point>> t = new HashSet();
         Set<Point> p;
 
-        for (int i = 0; i <= rightmost; ++i) {
-            for (int j = 0; j <= topmost; ++j) {
+        for (int i = 0; i <= rowCount; ++i) {
+            for (int j = 0; j <= columnCount; ++j) {
                 p = translate(points, i, j);
                 if (squares.containsAll(p)) {
                     t.add(p);
@@ -239,11 +239,11 @@ public class Pentominoes {
         return points.stream().map(point -> new Point(point.x + dx, point.y + dy)).collect(Collectors.toSet());
     }
 
-    int getRightmost() {
+    int getRowCount() {
         return this.squares.stream().max(Comparator.comparingInt((p) -> p.x)).get().x;
     }
 
-    int getTopmost() {
+    int getColumnCount() {
         return this.squares.stream().max(Comparator.comparingInt((p) -> p.y)).get().y;
     }
 
