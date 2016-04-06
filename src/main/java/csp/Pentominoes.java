@@ -10,6 +10,9 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A Pentominoes solver.
+ */
 public class Pentominoes {
 
     final ImmutableSet<Point> squares;
@@ -125,12 +128,29 @@ public class Pentominoes {
         }
     }
 
+    /**
+     * Creates a pentominoes puzzle from a set of coordinates.
+     *
+     * @param squares a set of coordinates. At least one `Point` should have
+     *                an x-coordinate of 0, and at least one `Point` should have
+     *                a y-coordinate of 0
+     */
     public Pentominoes(Set<Point> squares) {
         this.squares = ImmutableSet.copyOf(squares);
         this.rowCount = getRowCount();
         this.columnCount = getColumnCount();
     }
 
+    /**
+     * Reads a pentominoes puzzle from a string.
+     *
+     * Starting at the top row of the puzzle, this method reads each row as a sequence of
+     * either space or non-space characters. Non-space characters are squares in the puzzle.
+     * The current row terminates when the reader reaches a newline character.
+     *
+     * @param puzzle the puzzle, as described above
+     * @return a new
+     */
     public static Pentominoes read(String puzzle) {
         Set<Point> squares = new HashSet();
 
@@ -152,6 +172,11 @@ public class Pentominoes {
         return new Pentominoes(squares);
     }
 
+    /**
+     * Solves the puzzle.
+     *
+     * @return a set of Pentominoes, or <code>null</code> if there is no solution
+     */
     public Set<Pentomino> solve() {
         if (solution != null) {
             return solution;
@@ -165,6 +190,9 @@ public class Pentominoes {
         }.solve();
     }
 
+    /**
+     * Prints the solution.
+     */
     public void print() {
         if (solution == null) {
             solve();
